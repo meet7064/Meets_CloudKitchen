@@ -10,7 +10,7 @@ const AdminMenu = () => {
   const handleAddMenuItem = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token"); // Ensure the admin is logged in
+    const token = localStorage.getItem("adminToken"); // Ensure the admin is logged in
 
     try {
       const response = await fetch("http://localhost:5001/api/menu", {

@@ -13,7 +13,7 @@ const UserLogin = () => {
     try {
       const res = await axios.post("http://localhost:5001/api/users/login", form);
       localStorage.setItem("userToken", res.data.token);
-      navigate("/user/dashboard");
+      navigate("/");
     } catch (error) {
       alert("Invalid credentials");
     }

@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const MenuItemSchema = new mongoose.Schema({
   name: String,
-  price: Number,
   description: String,
-  image: String,
+  price: Number,
+  image: String, // URL to the image
 });
 
 module.exports = mongoose.model("MenuItem", MenuItemSchema);
