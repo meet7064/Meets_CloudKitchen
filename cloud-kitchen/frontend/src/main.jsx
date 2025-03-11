@@ -1,13 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom"; // Import BrowserRouter
+import { BrowserRouter as Router } from "react-router-dom";
 import App from "./App";
-import "./index.css"; // Ensure TailwindCSS is loaded
+import "./index.css"; // Ensure Tailwind is imported
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
+  <Router> {/* Wrap App in Router here */}
+    <App />
+  </Router>
 );

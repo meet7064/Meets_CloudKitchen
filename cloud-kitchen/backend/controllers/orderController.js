@@ -1,4 +1,4 @@
-const Order = require("../models/Order");
+const Order = require("../models/Orders");
 
 exports.getOrders = async (req, res) => {
   const orders = await Order.find().populate("user").populate("items");
