@@ -1,16 +1,19 @@
 const express = require("express");
-const { placeOrder, getOrders, updateOrderStatus } = require("../controllers/orderController");
+const { placeOrder, getOrders, getUserOrders, updateOrderStatus } = require("../controllers/orderController");
 const { protect, adminOnly } = require("../middleware/authMiddleware"); 
 
 const router = express.Router();
 
-// ✅ Fix: Remove `/orders`, since `/api/orders` is already set in `server.js`
+// ✅ Place an Order (User Only)
 router.post("/", protect, placeOrder);
 
-// ✅ Fix: Ensure `/` is used for fetching orders
-router.get("/", protect, getOrders);
+// ✅ Get Orders for Logged-in User (Fix for 404)
+router.get("/user", protect, getUserOrders); 
 
-// ✅ Fix: Remove `/orders/`, use `/:id/status`
+// ✅ Get All Orders (Admin Only)
+router.get("/", protect, adminOnly, getOrders);
+
+// ✅ Update Order Status (Admin Only)
 router.put("/:id/status", protect, adminOnly, updateOrderStatus);
 
 module.exports = router;

@@ -1,27 +1,39 @@
-const Order = require("../models/Orders"); // Ensure Order model is imported
-const MenuItem = require("../models/MenuItem"); // Ensure MenuItem model is imported
+const Order = require("../models/Orders"); // ✅ Ensure Order model is imported
+const MenuItem = require("../models/MenuItem"); // ✅ Ensure MenuItem model is imported
 
 // ✅ Place an order (User)
 const placeOrder = async (req, res) => {
   try {
-    const { items, totalPrice } = req.body;
+    const { items } = req.body;
 
     if (!items || items.length === 0) {
-      return res.status(400).json({ message: "No items in the order" });
+      return res.status(400).json({ message: "Order must contain items" });
     }
 
-    const newOrder = new Order({
-      user: req.user._id, // Ensure `req.user` is set in middleware
+    // ✅ Calculate total price from items
+    let totalPrice = 0;
+    for (const item of items) {
+      const menuItem = await MenuItem.findById(item.menuItem);
+      if (!menuItem) {
+        return res.status(400).json({ message: `Invalid menu item: ${item.menuItem}` });
+      }
+      totalPrice += item.quantity * menuItem.price;
+    }
+
+    const user = req.user;
+
+    const order = new Order({
+      user: user._id, // ✅ Store user ID only, use `.populate()` to get details later
       items,
-      totalPrice,
+      totalPrice, // ✅ Ensure totalPrice is included
       status: "Pending",
     });
 
-    const savedOrder = await newOrder.save();
+    const savedOrder = await order.save();
     res.status(201).json(savedOrder);
   } catch (error) {
     console.error("Error placing order:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Failed to place order" });
   }
 };
 
@@ -29,8 +41,8 @@ const placeOrder = async (req, res) => {
 const getOrders = async (req, res) => {
   try {
     const orders = await Order.find()
-      .populate("user", "name email") // Ensure user data is populated
-      .populate("items.menuItem", "name price");
+      .populate("user", "name email") // ✅ Populate user name & email
+      .populate("items.menuItem", "name price image"); // ✅ Populate menu items
 
     res.json(orders);
   } catch (error) {
@@ -38,6 +50,25 @@ const getOrders = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch orders" });
   }
 };
+
+// ✅ Get Logged-in User's Orders (User Only)
+const getUserOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user._id }) // ✅ Fetch orders only for the logged-in user
+      .populate("items.menuItem", "name price image") // ✅ Populate menu items
+      .sort({ createdAt: -1 }); // ✅ Show latest orders first
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "No orders found for this user." });
+    }
+
+    res.json(orders);
+  } catch (error) {
+    console.error("Error fetching user orders:", error);
+    res.status(500).json({ message: "Failed to fetch orders" });
+  }
+};
+
 
 // ✅ Update Order Status (Admin)
 const updateOrderStatus = async (req, res) => {
@@ -61,4 +92,4 @@ const updateOrderStatus = async (req, res) => {
 };
 
 // ✅ Export all functions
-module.exports = { placeOrder, getOrders, updateOrderStatus };
+module.exports = { placeOrder, getOrders, getUserOrders, updateOrderStatus };
