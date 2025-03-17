@@ -1,6 +1,8 @@
 import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import AdminNavbar from "./admin/AdminNavbar";
+import SuperAdminNavbar from "./superadmin/SuperAdminNavbar";
 import Footer from "./components/Footer";
 import Home from "./userpages/Home";
 import Menu from "./userpages/Menu";
@@ -16,33 +18,64 @@ import UserRegister from "./userpages/UserRegister";
 import AdminHome from "./admin/AdminHome";
 import SalesReport from "./admin/SalesReport";
 import UserChat from "./userpages/UserChat";
-import SuperAdminDashboard from "./superadmin/SuperAdminDashboard"; // ✅ Import Super Admin Page
+import SuperAdminDashboard from "./superadmin/SuperAdminDashboard"; 
 import CreateAdmin from "./superadmin/CreateAdmin";
+import SuperAdminLogin from "./superadmin/SuperAdminLogin";
+import AdminList from "./superadmin/AdminList";
 
 const App = () => {
   const location = useLocation();
 
-  // ❌ Hide Navbar & Footer for these paths
+  // ❌ Paths where Navbar & Footer should be hidden but logo should be shown
   const hiddenPaths = [
     "/admin/login",
     "/admin/register",
     "/user/login",
     "/user/register",
-    "/admin/home",
-    "/admin/orders",
-    "/admin/menu",
-    "/admin/dashboard",
-    "/admin/sales-report",
-    "/super-admin/dashboard", // ✅ Hiding Navbar/Footer on Super Admin Page
-    "/super-admin/create-admin", // ✅ Hiding Navbar/Footer on Create Admin Page
+    "/super-admin/login",
   ];
-  const hideNavbarFooter = hiddenPaths.includes(location.pathname);
+
+  // ✅ Paths where Super Admin Navbar should be used
+  const superAdminPaths = [
+    "/super-admin/dashboard",
+    "/super-admin/create-admin",
+    "/super-admin/admin-list",
+  ];
+
+  // ✅ Paths where Admin Navbar should be used
+  const adminPaths = [
+    "/admin/dashboard",
+    "/admin/menu",
+    "/admin/orders",
+    "/admin/sales-report",
+    "/admin/home",
+  ];
 
   return (
     <div className="flex flex-col min-h-screen">
-      {!hideNavbarFooter && <Navbar />} {/* ✅ Show Navbar only if not in hidden paths */}
+      {/* ✅ Show Navbar Based on User Role */}
+      {superAdminPaths.includes(location.pathname) ? (
+        <SuperAdminNavbar />
+      ) : adminPaths.includes(location.pathname) ? (
+        <AdminNavbar />
+      ) : !hiddenPaths.includes(location.pathname) ? (
+        <Navbar />
+      ) : (
+        <div className="bg-gray-900 text-white py-4 px-6 shadow-md text-center">
+          {/* ✅ Show Logo Only on Hidden Pages */}
+          {location.pathname.startsWith("/admin") ? (
+            <h1 className="text-2xl font-bold">🔧 Cloud Kitchen - Admin</h1>
+          ) : location.pathname.startsWith("/super-admin") ? (
+            <h1 className="text-2xl font-bold">👑 Cloud Kitchen - Super Admin</h1>
+          ) : (
+            <h1 className="text-2xl font-bold">🍽️ Cloud Kitchen</h1>
+          )}
+        </div>
+      )}
+
       <div className="flex-grow">
         <Routes>
+          {/* ✅ User Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/menu" element={<Menu />} />
           <Route path="/profile" element={<UserProfile />} />
@@ -52,22 +85,25 @@ const App = () => {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/menu" element={<AdminMenu />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/sales-report" element={<SalesReport />} />
 
-          {/* ✅ Super Admin Route */}
+          {/* ✅ Super Admin Routes */}
           <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
           <Route path="/super-admin/create-admin" element={<CreateAdmin />} />
+          <Route path="/super-admin/login" element={<SuperAdminLogin />} />
+          <Route path="/super-admin/admin-list" element={<AdminList />} />
 
-          {/* ✅ Admin & User Auth Routes */}
+          {/* ✅ Auth Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/register" element={<AdminRegister />} />
           <Route path="/user/login" element={<UserLogin />} />
           <Route path="/user/register" element={<UserRegister />} />
           <Route path="/admin/home" element={<AdminHome />} />
-          <Route path="/admin/sales-report" element={<SalesReport />} />
           <Route path="/user/chat" element={<UserChat />} />
         </Routes>
       </div>
-      {!hideNavbarFooter && <Footer />} {/* ✅ Show Footer only if not in hidden paths */}
+
+      {!hiddenPaths.includes(location.pathname) && <Footer />}
     </div>
   );
 };

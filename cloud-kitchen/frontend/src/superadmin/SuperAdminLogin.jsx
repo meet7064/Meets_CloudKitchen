@@ -10,22 +10,38 @@ const SuperAdminLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/superadmin/login", { email, password });
+      const res = await axios.post("http://localhost:5001/api/super-admin/login", { email, password });
       localStorage.setItem("superadminToken", res.data.token);
-      navigate("/superadmin/dashboard");
+      navigate("/super-admin/dashboard");
     } catch (err) {
       alert("Login failed!");
     }
   };
 
   return (
-    <div>
-      <h2>Super Admin Login</h2>
-      <form onSubmit={handleLogin}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <button type="submit">Login</button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Super Admin Login</h2>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg"
+          />
+          <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">
+            Login
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

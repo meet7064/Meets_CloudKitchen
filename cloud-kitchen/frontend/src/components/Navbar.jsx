@@ -36,7 +36,7 @@ const Navbar = () => {
           ) : (
             <Link 
               to="/user/login" 
-              className="ml-4 bg-yellow-500 px-4 py-2 rounded-md hover:bg-yellow-600 transition"
+              className=""
             >
               Login
             </Link>
@@ -69,7 +69,7 @@ const Navbar = () => {
           ) : (
             <Link 
               to="/user/login" 
-              className="block w-full bg-yellow-500 py-2 mt-2 rounded-md hover:bg-yellow-600 transition"
+              className="hover:text-gray-400"
             >
               Login
             </Link>

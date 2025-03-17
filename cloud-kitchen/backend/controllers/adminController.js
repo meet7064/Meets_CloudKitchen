@@ -1,4 +1,5 @@
 const Admin = require("../models/Admin");
+const AdminActivityLog = require("../models/AdminActivityLog");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
@@ -32,5 +33,33 @@ exports.loginAdmin = async (req, res) => {
     res.json({ message: "Admin logged in", token });
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.updateMenuItem = async (req, res) => {
+  try {
+    const { menuId } = req.params;
+    const { name, price, description } = req.body;
+
+    const menuItem = await Menu.findById(menuId);
+    if (!menuItem) {
+      return res.status(404).json({ message: "Menu item not found" });
+    }
+
+    menuItem.name = name;
+    menuItem.price = price;
+    menuItem.description = description;
+    await menuItem.save();
+
+    // ✅ Log admin activity
+    await AdminActivityLog.create({
+      adminId: req.admin._id, // Ensure admin ID is passed from middleware
+      action: `Updated menu item: ${name}`,
+    });
+
+    res.json({ message: "Menu item updated successfully", menuItem });
+  } catch (error) {
+    console.error("Error updating menu:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

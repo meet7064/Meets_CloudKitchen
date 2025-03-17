@@ -15,19 +15,19 @@ const AdminHome = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       {/* ✅ Navbar */}
-      <nav className="bg-gray-900 text-white py-4 px-6 shadow-md">
+      {/* <nav className="bg-gray-900 text-white py-4 px-6 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">
             <Link to="/" className="hover:text-yellow-400 transition">Cloud Kitchen</Link>
-          </h1>
+          </h1> */}
 
           {/* Mobile Menu Button */}
-          <button className="sm:hidden text-white focus:outline-none" onClick={() => setMenuOpen(!menuOpen)}>
+          {/* <button className="sm:hidden text-white focus:outline-none" onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+          </button> */}
 
           {/* Desktop Navigation */}
-          <ul className="hidden sm:flex space-x-6">
+          {/* <ul className="hidden sm:flex space-x-6">
             <Link to="/admin/login" className="text-blue-400 font-semibold hover:text-blue-500 transition">Login</Link>
             <Link to="/admin/register" className="text-green-400 font-semibold hover:text-green-500 transition">Register</Link>
             <button 
@@ -38,7 +38,7 @@ const AdminHome = () => {
             </button>
           </ul>
         </div>
-      </nav>
+      </nav> */}
 
       {/* ✅ Hero Section */}
       <header className="flex flex-col md:flex-row items-center justify-between px-10 py-20">

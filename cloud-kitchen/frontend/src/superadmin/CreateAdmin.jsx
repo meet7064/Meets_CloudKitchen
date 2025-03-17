@@ -2,80 +2,53 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const CreateAdmin = () => {
-  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  // 🔄 Handle Input Changes
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setMessage(""); // Clear previous messages
-  };
-
-  // ✅ Handle Create Admin
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.password) {
-      setMessage("⚠️ All fields are required!");
-      return;
-    }
-
-    setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:5001/api/super-admin/create-admin",
-        formData,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("superAdminToken")}` } }
-      );
-
-      setMessage("✅ Admin created successfully!");
-      setFormData({ name: "", email: "", password: "" }); // Reset form after success
+      await axios.post("http://localhost:5001/api/super-admin/create-admin", { name, email, password }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("superadminToken")}` }
+      });
+      alert("Admin created successfully!");
     } catch (err) {
-      setMessage("❌ Failed to create admin. Please try again.");
+      alert("Failed to create admin");
     }
-    setLoading(false);
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Create Admin</h2>
-
-      {message && <p className={`text-sm mb-4 ${message.includes("✅") ? "text-green-600" : "text-red-500"}`}>{message}</p>}
-
-      <form onSubmit={handleCreateAdmin} className="space-y-4">
-        <input 
-          type="text" 
-          name="name" 
-          placeholder="Admin Name" 
-          value={formData.name} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded"
-        />
-        <input 
-          type="email" 
-          name="email" 
-          placeholder="Email Address" 
-          value={formData.email} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded"
-        />
-        <input 
-          type="password" 
-          name="password" 
-          placeholder="Password" 
-          value={formData.password} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded"
-        />
-        <button 
-          type="submit" 
-          className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          disabled={loading}
-        >
-          {loading ? "Creating..." : "Create Admin"}
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Create Admin</h2>
+        <form onSubmit={handleCreateAdmin} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-lg"
+          />
+          <button type="submit" className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700">
+            Create Admin
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

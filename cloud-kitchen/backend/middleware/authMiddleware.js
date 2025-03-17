@@ -55,4 +55,19 @@ const adminOnly = (req, res, next) => {
   return res.status(403).json({ message: "Not authorized as admin" });
 };
 
-module.exports = { protect, adminOnly };
+const protectSuperAdmin = (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.role !== "superadmin") return res.status(403).json({ message: "Forbidden" });
+
+    req.superAdmin = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: "Invalid token" });
+  }
+};
+
+module.exports = { protect, adminOnly, protectSuperAdmin };
