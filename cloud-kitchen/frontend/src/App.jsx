@@ -26,7 +26,7 @@ import AdminList from "./superadmin/AdminList";
 const App = () => {
   const location = useLocation();
 
-  // ❌ Paths where Navbar & Footer should be hidden but logo should be shown
+  // ❌ Paths where Navbar & Footer should be hidden but branding logo should be shown
   const hiddenPaths = [
     "/admin/login",
     "/admin/register",
@@ -35,14 +35,14 @@ const App = () => {
     "/super-admin/login",
   ];
 
-  // ✅ Paths where Super Admin Navbar should be used
+  // ✅ Paths for Marketplace Management (Super Admin)
   const superAdminPaths = [
     "/super-admin/dashboard",
     "/super-admin/create-admin",
     "/super-admin/admin-list",
   ];
 
-  // ✅ Paths where Admin Navbar should be used
+  // ✅ Paths for Vendor Dashboard (Admin)
   const adminPaths = [
     "/admin/dashboard",
     "/admin/menu",
@@ -52,7 +52,7 @@ const App = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#FDFCF8]">
       {/* ✅ Show Navbar Based on User Role */}
       {superAdminPaths.includes(location.pathname) ? (
         <SuperAdminNavbar />
@@ -61,39 +61,39 @@ const App = () => {
       ) : !hiddenPaths.includes(location.pathname) ? (
         <Navbar />
       ) : (
-        <div className="bg-gray-900 text-white py-4 px-6 shadow-md text-center">
-          {/* ✅ Show Logo Only on Hidden Pages */}
+        <div className="bg-stone-900 text-amber-50 py-6 px-6 shadow-lg text-center">
+          {/* ✅ Branded Logo Header for Auth Pages */}
           {location.pathname.startsWith("/admin") ? (
-            <h1 className="text-2xl font-bold">🔧 Cloud Kitchen - Admin</h1>
+            <h1 className="text-2xl font-bold tracking-tight">🌿 Vendor Portal</h1>
           ) : location.pathname.startsWith("/super-admin") ? (
-            <h1 className="text-2xl font-bold">👑 Cloud Kitchen - Super Admin</h1>
+            <h1 className="text-2xl font-bold tracking-tight">🏛️ Marketplace Manager</h1>
           ) : (
-            <h1 className="text-2xl font-bold">🍽️ Cloud Kitchen</h1>
+            <h1 className="text-2xl font-bold tracking-tight">🌻 Local Artisan Market</h1>
           )}
         </div>
       )}
 
       <div className="flex-grow">
         <Routes>
-          {/* ✅ User Routes */}
+          {/* ✅ Community/User Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/menu" element={<Menu />} />
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/orders" element={<Orders />} />
 
-          {/* ✅ Admin Routes */}
+          {/* ✅ Vendor Management Routes */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/menu" element={<AdminMenu />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/sales-report" element={<SalesReport />} />
 
-          {/* ✅ Super Admin Routes */}
+          {/* ✅ Marketplace Admin Routes */}
           <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
           <Route path="/super-admin/create-admin" element={<CreateAdmin />} />
           <Route path="/super-admin/login" element={<SuperAdminLogin />} />
           <Route path="/super-admin/admin-list" element={<AdminList />} />
 
-          {/* ✅ Auth Routes */}
+          {/* ✅ Auth & Utility Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/register" element={<AdminRegister />} />
           <Route path="/user/login" element={<UserLogin />} />

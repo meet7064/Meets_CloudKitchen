@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { Plus, Pencil, Trash2, Upload, Image as ImageIcon, Store } from "lucide-react";
 
 const AdminMenu = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -10,29 +11,24 @@ const AdminMenu = () => {
 
   const token = localStorage.getItem("adminToken");
 
-  // Fetch menu items
+  // Fetch items
   useEffect(() => {
     const fetchMenu = async () => {
       try {
         const response = await axios.get("http://localhost:5001/api/menu");
         setMenuItems(response.data);
       } catch (error) {
-        setMessage("❌ Failed to fetch menu items.");
+        setMessage("❌ Failed to fetch the collection.");
       }
     };
     fetchMenu();
   }, []);
 
-  // Handle Input Change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-
-    if (e.target.name === "image") {
-      setPreviewImage(e.target.value);
-    }
+    if (e.target.name === "image") setPreviewImage(e.target.value);
   };
 
-  // Handle Image Upload
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -44,38 +40,27 @@ const AdminMenu = () => {
       const response = await axios.post("http://localhost:5001/api/upload", formData, {
         headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
       });
-
       setForm({ ...form, image: response.data.imageUrl });
       setPreviewImage(response.data.imageUrl);
     } catch (error) {
-      setMessage("❌ Failed to upload image.");
+      setMessage("❌ Failed to upload artisan image.");
     }
   };
 
-  // Add or Update Menu Item
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!form.name || !form.description || !form.price || !form.image) {
-      setMessage("⚠️ Please fill out all fields.");
+      setMessage("⚠️ Please provide all details for your handcrafted item.");
       return;
     }
 
     try {
-      const url = editItemId
-        ? `http://localhost:5001/api/menu/${editItemId}`
-        : "http://localhost:5001/api/menu";
-
+      const url = editItemId ? `http://localhost:5001/api/menu/${editItemId}` : "http://localhost:5001/api/menu";
       const method = editItemId ? "PUT" : "POST";
 
-      await axios({
-        method,
-        url,
-        headers: { Authorization: `Bearer ${token}` },
-        data: form,
-      });
+      await axios({ method, url, headers: { Authorization: `Bearer ${token}` }, data: form });
 
-      setMessage(editItemId ? "✅ Item updated!" : "✅ Item added!");
+      setMessage(editItemId ? "✨ Item updated in your gallery!" : "✨ New item added to your collection!");
       setForm({ name: "", description: "", price: "", image: "" });
       setPreviewImage("");
       setEditItemId(null);
@@ -83,88 +68,101 @@ const AdminMenu = () => {
       const response = await axios.get("http://localhost:5001/api/menu");
       setMenuItems(response.data);
     } catch (error) {
-      setMessage("❌ Failed to update menu.");
+      setMessage("❌ Failed to update collection.");
     }
   };
 
-  // Delete Item
   const handleDelete = async (id) => {
+    if (!window.confirm("Remove this item from your shop?")) return;
     try {
       await axios.delete(`http://localhost:5001/api/menu/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMenuItems(menuItems.filter((item) => item._id !== id));
-      setMessage("🗑️ Item deleted successfully.");
+      setMessage("🗑️ Item removed from shop.");
     } catch (error) {
-      setMessage("❌ Failed to delete menu item.");
+      setMessage("❌ Failed to delete item.");
     }
   };
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-extrabold mb-6 text-gray-800">📋 Manage Menu</h1>
+    <div className="p-8 lg:p-12 bg-[#FDFCF8] min-h-screen text-stone-900">
+      <header className="mb-10">
+        <h1 className="text-4xl font-extrabold flex items-center gap-3">
+          <Store className="text-amber-700" size={32} />
+          Collection Manager
+        </h1>
+        <p className="text-stone-500 mt-2">Add, edit, or curate the goods available in your shop.</p>
+      </header>
 
-      {/* 📌 Message Box */}
-      {message && <p className="text-center text-white py-2 px-4 rounded-lg bg-green-500 mb-4">{message}</p>}
+      {message && (
+        <div className="mb-6 animate-in fade-in slide-in-from-top-4">
+          <p className="text-center bg-stone-900 text-white py-3 px-6 rounded-xl font-bold shadow-lg">
+            {message}
+          </p>
+        </div>
+      )}
 
-      {/* 📌 Form to Add/Edit Menu */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-semibold mb-4">{editItemId ? "✏️ Edit Menu Item" : "➕ Add New Menu Item"}</h2>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <input type="text" name="name" placeholder="Item Name" value={form.name} onChange={handleChange} required className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-400" />
-          <input type="text" name="description" placeholder="Description" value={form.description} onChange={handleChange} required className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-400" />
-          <input type="number" name="price" placeholder="Price" value={form.price} onChange={handleChange} required className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-400" />
-
-          {/* Image Upload OR URL */}
-          <div className="col-span-2">
-            <label className="block text-gray-700 font-semibold mb-2">Choose Image Upload or URL</label>
-
-            {/* Upload Image */}
-            <label className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-600 mr-2 inline-block">
-              Upload Image
-              <input type="file" className="hidden" onChange={handleImageUpload} />
-            </label>
-
-            {/* OR Enter Image URL */}
-            <input type="text" name="image" placeholder="Or Enter Image URL" value={form.image} onChange={handleChange} className="w-full p-3 border rounded mt-2" />
-
-            {/* Image Preview */}
-            {previewImage && (
-              <div className="mt-3 flex justify-center">
-                <img src={previewImage} alt="Preview" className="w-32 h-32 object-cover rounded-lg shadow-md" />
-              </div>
-            )}
+      {/* 📌 Form Section */}
+      <div className="bg-white p-8 rounded-3xl border border-stone-100 shadow-sm mb-12">
+        <h2 className="text-xl font-bold mb-6 text-stone-800 flex items-center gap-2">
+          {editItemId ? <Pencil size={20} className="text-amber-700" /> : <Plus size={20} className="text-amber-700" />}
+          {editItemId ? "Refine Item Details" : "Feature New Craft"}
+        </h2>
+        
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <input type="text" name="name" placeholder="Item Name (e.g. Sourdough Loaf)" value={form.name} onChange={handleChange} required className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none" />
+            <textarea name="description" placeholder="The story behind this item..." value={form.description} onChange={handleChange} required className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none h-24" />
+            <input type="number" name="price" placeholder="Price ($)" value={form.price} onChange={handleChange} required className="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none" />
           </div>
 
-          <button type="submit" className="col-span-1 sm:col-span-2 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all">
-            {editItemId ? "Update Item" : "Add Item"}
-          </button>
+          <div className="space-y-4">
+            <div className="flex flex-col items-center justify-center border-2 border-dashed border-stone-200 bg-stone-50 rounded-2xl p-6 transition-colors hover:border-amber-300">
+              {previewImage ? (
+                <img src={previewImage} alt="Preview" className="w-32 h-32 object-cover rounded-xl shadow-md mb-4" />
+              ) : (
+                <ImageIcon className="text-stone-300 mb-2" size={48} />
+              )}
+              
+              <div className="flex gap-2">
+                <label className="bg-stone-800 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-amber-800 transition-colors text-sm font-bold flex items-center gap-2">
+                  <Upload size={16} /> Upload
+                  <input type="file" className="hidden" onChange={handleImageUpload} />
+                </label>
+              </div>
+              <input type="text" name="image" placeholder="Or paste image link..." value={form.image} onChange={handleChange} className="w-full mt-4 p-2 text-xs bg-white border border-stone-200 rounded-lg text-center" />
+            </div>
+
+            <button type="submit" className="w-full bg-stone-900 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-amber-800 transition-all active:scale-95">
+              {editItemId ? "Confirm Updates" : "Add to Collection"}
+            </button>
+            {editItemId && <button onClick={() => { setEditItemId(null); setForm({ name: "", description: "", price: "", image: "" }); setPreviewImage(""); }} className="w-full text-stone-400 font-bold text-sm">Cancel Editing</button>}
+          </div>
         </form>
       </div>
 
-      {/* 📌 List of Menu Items */}
-      <h2 className="text-2xl font-bold mb-4">🍔 Menu Items</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {/* 📌 Display Section */}
+      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">Your Live Shopfront</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {menuItems.map((item) => (
-          <div key={item._id} className="bg-white p-4 rounded-lg shadow-md transition-transform hover:scale-105">
-            <img
-              src={item.image || "/placeholder.jpg"}
-              alt={item.name}
-              className="w-full h-40 object-cover rounded-lg"
-            />
-            <div className="mt-2">
-              <h3 className="text-lg font-bold text-gray-800">{item.name}</h3>
-              <p className="text-gray-600">{item.description}</p>
-              <p className="text-green-600 font-bold mt-2">${item.price}</p>
+          <div key={item._id} className="bg-white rounded-2xl overflow-hidden border border-stone-100 shadow-sm transition-all hover:shadow-xl group">
+            <div className="relative h-48 overflow-hidden">
+              <img src={item.image || "/placeholder.jpg"} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
             </div>
-
-            <div className="flex justify-between mt-4">
-              <button onClick={() => { setEditItemId(item._id); setForm(item); setPreviewImage(item.image); }} className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-all">
-                ✏️ Edit
-              </button>
-              <button onClick={() => handleDelete(item._id)} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-all">
-                🗑️ Delete
-              </button>
+            <div className="p-5">
+              <h3 className="text-lg font-bold text-stone-800">{item.name}</h3>
+              <p className="text-stone-500 text-sm mt-1 line-clamp-2">{item.description}</p>
+              <p className="text-amber-800 font-bold mt-3">${item.price}</p>
+              
+              <div className="flex gap-2 mt-4">
+                <button onClick={() => { setEditItemId(item._id); setForm(item); setPreviewImage(item.image); window.scrollTo({top: 0, behavior: 'smooth'}); }} className="flex-1 flex items-center justify-center gap-2 bg-stone-100 text-stone-600 py-2 rounded-lg hover:bg-stone-200 transition-colors text-sm font-bold">
+                  <Pencil size={14} /> Edit
+                </button>
+                <button onClick={() => handleDelete(item._id)} className="p-2 text-stone-400 hover:text-red-600 transition-colors">
+                  <Trash2 size={18} />
+                </button>
+              </div>
             </div>
           </div>
         ))}
